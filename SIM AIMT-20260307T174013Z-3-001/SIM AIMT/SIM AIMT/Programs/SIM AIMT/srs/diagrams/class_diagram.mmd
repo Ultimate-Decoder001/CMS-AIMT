@@ -1,0 +1,62 @@
+classDiagram
+    class User {
+        +String employee_id
+        +String name
+        +String email
+        +String role
+        +String password_hash
+        +String department
+        +String designation
+        +String phone
+    }
+
+    class Book {
+        +int book_id
+        +String book_code
+        +String title
+        +String author
+        +String edition
+        +String isbn
+        +String category
+        +int quantity
+        +int available_quantity
+        +String shelf_location
+        +datetime created_at
+    }
+
+    class BookTransaction {
+        +int id
+        +date issue_date
+        +date due_date
+        +date return_date
+        +String status
+    }
+
+    class Student {
+        +int id
+        +String roll_number
+        +String name
+        +String course
+        +int semester
+    }
+
+    class Grade {
+        +int id
+        +float marks
+        +String grade
+        +String exam_type
+    }
+
+    class Notification {
+        +int id
+        +String title
+        +String message
+        +bool is_read
+    }
+
+    User "1" -- "*" BookTransaction : "issues/returns"
+    User "1" -- "*" Notification : "receives"
+    User "1" -- "*" Student : "owns"
+    User "1" -- "*" Grade : "marks"
+    Book "1" -- "*" BookTransaction : "has"
+    Student "1" -- "*" Grade : "earns"

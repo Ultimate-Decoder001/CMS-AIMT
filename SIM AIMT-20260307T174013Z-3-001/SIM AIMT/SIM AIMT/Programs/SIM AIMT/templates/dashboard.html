@@ -1,0 +1,565 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AIMT College Management{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2 class="page-title">Welcome, {{ current_user.name }}!</h2>
+        {% if current_user.role == 'HOD' and current_user.department %}
+        <p class="text-muted">Head of Department - {{ current_user.department }}</p>
+        {% else %}
+        <p class="text-muted">Here's an overview of your college management system</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Statistics Cards - Role Based -->
+{% if current_user.role in ['Registrar', 'Director', 'Dean', 'Management'] %}
+<!-- Registrar/Director/Dean/Management/AO View - All Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.total_employees or 0 }}">0</span></h3>
+                <p>Total Employees</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.total_students or 0 }}">0</span></h3>
+                <p>Total Students</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.total_books or 0 }}">0</span></h3>
+                <p>Total Books</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-book-reader"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.available_books or 0 }}">0</span></h3>
+                <p>Available Books</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="fas fa-calendar-minus"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.pending_leaves or 0 }}">0</span></h3>
+                <p>Pending Leaves</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.books_issued or 0 }}">0</span></h3>
+                <p>Books Issued</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif current_user.role == 'Student' %}
+<!-- Student View - Academic Focus -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="stat-info">
+                <h3>My Grades</h3>
+                <p>View Academic Performance</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.pending_leaves or 0 }}">0</span></h3>
+                <p>Pending Leaves</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.total_books or 0 }}">0</span></h3>
+                <p>Library Books Available</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif is_hod() or current_user.role in ['HOD','Faculty','Accountant','Library','HR'] %}
+<!-- HOD/Faculty/Accountant/Library/HR View -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.total_employees or 0 }}">0</span></h3>
+                <p>{% if current_user.role == 'HOD' %}Department Employees{% else %}Total Employees{% endif %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.total_students or 0 }}">0</span></h3>
+                <p>{% if current_user.role == 'HOD' %}Department Students{% else %}Total Students{% endif %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-calendar-minus"></i>
+            </div>
+            <div class="stat-info">
+                <h3><span class="counter" data-count="{{ stats.pending_leaves or 0 }}">0</span></h3>
+                <p>{% if current_user.role == 'HOD' %}Dept Pending Leaves{% else %}Pending Leaves{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions and Recent Activity -->
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bolt me-2"></i>Quick Actions
+            </div>
+            <div class="card-body">
+                <!-- Registrar/Director/Dean/Management Actions -->
+                {% if current_user.role in ['Registrar', 'Director', 'Dean', 'Management'] %}
+                <a href="{{ url_for('add_employee') }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-user-plus me-2"></i>Add Employee
+                </a>
+                <a href="{{ url_for('manage_employees') }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-users me-2"></i>Manage Employees
+                </a>
+                <a href="{{ url_for('apply_leave') }}" class="btn btn-info w-100 mb-2">
+                    <i class="fas fa-calendar-minus me-2"></i>Apply Leave
+                </a>
+                <a href="{{ url_for('leave_management') }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-calendar-check me-2"></i>Manage Leaves
+                </a>
+                <a href="{{ url_for('add_student') }}" class="btn btn-outline-success w-100 mb-2">
+                    <i class="fas fa-user-graduate me-2"></i>Add Student
+                </a>
+                <a href="{{ url_for('manage_students') }}" class="btn btn-success w-100 mb-2">
+                    <i class="fas fa-users me-2"></i>Manage Students
+                </a>
+                            
+                {% endif %}
+                
+                <!-- HOD Actions -->
+                {% if is_hod() or current_user.role in ['HOD', 'Director', 'Dean'] %}
+                <a href="{{ url_for('manage_students') }}" class="btn btn-success w-100 mb-2">
+                    <i class="fas fa-users me-2"></i>Manage Students
+                </a>
+                <a href="{{ url_for('manage_grades') }}" class="btn btn-outline-success w-100 mb-2">
+                    <i class="fas fa-star me-2"></i>Manage Grades
+                </a>
+                <a href="{{ url_for('manage_subjects') }}" class="btn btn-warning w-100 mb-2">
+                    <i class="fas fa-book me-2"></i>Manage Subjects
+                </a>
+                <a href="{{ url_for('leave_management') }}" class="btn btn-info w-100 mb-2">
+                    <i class="fas fa-calendar-check me-2"></i>Manage Leaves
+                </a>
+                {% endif %}
+                
+                <!-- Library Actions -->
+                {% if current_user.role in ['Library', 'Library Head', 'Librarian', 'Registrar', 'Director', 'Dean', 'Management'] %}
+                <a href="{{ url_for('add_book') }}" class="btn btn-warning w-100 mb-2">
+                    <i class="fas fa-book-medical me-2"></i>Add Book
+                </a>
+                <a href="{{ url_for('issue_book') }}" class="btn btn-outline-warning w-100 mb-2">
+                    <i class="fas fa-bookmark me-2"></i>Issue Book
+                </a>
+                <a href="{{ url_for('library_dashboard') }}" class="btn btn-outline-secondary w-100 mb-2">
+                    <i class="fas fa-chart-bar me-2"></i>Library Dashboard
+                </a>
+                {% endif %}
+                
+                <!-- Accountant Actions -->
+                {% if current_user.role in ['Accountant', 'Registrar', 'Director', 'Dean', 'Management'] %}
+                <a href="{{ url_for('add_salary') }}" class="btn btn-info w-100 mb-2">
+                    <i class="fas fa-dollar-sign me-2"></i>Add Salary
+                </a>
+                <a href="{{ url_for('add_expense') }}" class="btn btn-outline-info w-100 mb-2">
+                    <i class="fas fa-receipt me-2"></i>Add Expense
+                </a>
+                {% endif %}
+                
+                <!-- Faculty Actions -->
+                {% if current_user.role in ['Faculty', 'HOD'] %}
+                <a href="{{ url_for('student_attendance') }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-clipboard-check me-2"></i>Mark Attendance
+                </a>
+                <a href="{{ url_for('manage_grades') }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-star me-2"></i>Mark Grades
+                </a>
+                {% endif %}
+                
+                <!-- Student Actions -->
+                {% if current_user.role == 'Student' %}
+                <a href="{{ url_for('apply_leave') }}" class="btn btn-info w-100 mb-2">
+                    <i class="fas fa-calendar-minus me-2"></i>Apply Leave
+                </a>
+                <a href="{{ url_for('my_attendance') }}" class="btn btn-outline-info w-100 mb-2">
+                    <i class="fas fa-calendar-alt me-2"></i>My Attendance
+                </a>
+                {% endif %}
+                
+                <!-- Common Actions -->
+                <a href="{{ url_for('apply_leave') }}" class="btn btn-success w-100 mb-2">
+                    <i class="fas fa-calendar-minus me-2"></i>Apply Leave
+                </a>
+                <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-user-cog me-2"></i>My Profile
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Chart -->
+    <div class="col-md-4">
+        <div class="card chart-card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie me-2"></i>Overview
+            </div>
+            <div class="card-body" style="position: relative; height: 280px;">
+                <canvas id="statsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Leave Requests -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-alt me-2"></i>Recent Leave Requests
+            </div>
+            <div class="card-body p-0">
+                {% if recent_leaves %}
+                <div class="list-group list-group-flush">
+                    {% for leave in recent_leaves %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ leave.employee_id }}</strong>
+                                <br>
+                                <small class="text-muted">{{ leave.leave_type }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-{% if leave.status == 'Approved' %}success{% elif leave.status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                    {{ leave.status }}
+                                </span>
+                                {% if current_user.role in ['Director', 'Management'] and leave.status not in ['Approved','Rejected'] %}
+                                <div class="mt-2">
+                                    <a href="{{ url_for('approve_leave', leave_id=leave.id) }}" class="btn btn-sm btn-success confirm-action" data-message="Approve this leave?">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{{ url_for('reject_leave', leave_id=leave.id) }}" class="btn btn-sm btn-danger confirm-action" data-message="Reject this leave?">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="card-body text-center text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p>No leave requests</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Library Transactions -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-book-reader me-2"></i>Recent Library Transactions
+            </div>
+            <div class="card-body p-0">
+                {% if recent_transactions %}
+                <div class="list-group list-group-flush">
+                    {% for transaction in recent_transactions %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ transaction.book.title }}</strong>
+                                <br>
+                                <small class="text-muted">{{ transaction.employee_id }}</small>
+                            </div>
+                            <span class="badge bg-{% if transaction.status == 'Issued' %}primary{% else %}success{% endif %}">
+                                {{ transaction.status }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="card-body text-center text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p>No transactions</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Expenses -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-money-bill-wave me-2"></i>Recent Expenses
+            </div>
+            <div class="card-body p-0">
+                {% if recent_expenses %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Submitted By</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in recent_expenses %}
+                            <tr>
+                                <td>{{ expense.category }}</td>
+                                <td>{{ expense.description }}</td>
+                                <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                                <td>{{ expense.submitted_by }}</td>
+                                <td>
+                                    <span class="badge bg-{% if expense.status == 'Approved' %}success{% elif expense.status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                        {{ expense.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="card-body text-center text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p>No expenses submitted</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role-Specific Sections -->
+{% if current_user.role == 'Student' and grade_data %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-graduation-cap me-2"></i>My Grades
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Grade</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in grade_data %}
+                            <tr>
+                                <td>{{ grade.subject }}</td>
+                                <td>{{ grade.marks }}</td>
+                                <td>
+                                    <span class="badge bg-{% if grade.grade in ['A', 'A+'] %}success{% elif grade.grade in ['B', 'B+'] %}info{% elif grade.grade in ['C', 'C+'] %}warning{% else %}danger{% endif %}">
+                                        {{ grade.grade }}
+                                    </span>
+                                </td>
+                                <td>{{ grade.remarks or 'Good' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var el = document.getElementById('statsChart');
+    if (!el) return;
+    var ctx = el.getContext('2d');
+    var data = [
+        {{ stats.total_employees or 0 }},
+        {{ stats.total_students or 0 }},
+        {{ stats.total_books or 0 }},
+        {{ stats.available_books or 0 }},
+        {{ stats.books_issued or 0 }}
+    ];
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Employees','Students','Books','Available','Issued'],
+            datasets: [{
+                data: data,
+                backgroundColor: ['#0b63ff','#6a1b9a','#ffab00','#00c853','#1976d2']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% if current_user.role in ['Faculty', 'HOD'] and grade_data %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-star me-2"></i>Recently Marked Grades
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Grade</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in grade_data %}
+                            <tr>
+                                <td>{{ grade.student.full_name if grade.student else 'N/A' }}</td>
+                                <td>{{ grade.subject }}</td>
+                                <td>{{ grade.marks }}</td>
+                                <td>
+                                    <span class="badge bg-{% if grade.grade in ['A', 'A+'] %}success{% elif grade.grade in ['B', 'B+'] %}info{% elif grade.grade in ['C', 'C+'] %}warning{% else %}danger{% endif %}">
+                                        {{ grade.grade }}
+                                    </span>
+                                </td>
+                                <td>{{ grade.created_at.strftime('%d-%m-%Y') if grade.created_at else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}{% endblock %}
+
+<!-- Confirmation Modal for approve/reject actions -->
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmActionText">Are you sure?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="confirmActionYes" class="btn btn-danger">Yes</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+        var confirmModalEl = document.getElementById('confirmActionModal');
+        if (!confirmModalEl) return;
+        var confirmModal = new bootstrap.Modal(confirmModalEl);
+        var confirmText = document.getElementById('confirmActionText');
+        var confirmYes = document.getElementById('confirmActionYes');
+
+        document.querySelectorAll('.confirm-action').forEach(function(btn){
+                btn.addEventListener('click', function(e){
+                        e.preventDefault();
+                        var href = btn.getAttribute('href');
+                        var msg = btn.getAttribute('data-message') || 'Are you sure?';
+                        confirmText.textContent = msg;
+                        confirmYes.setAttribute('href', href);
+                        confirmModal.show();
+                });
+        });
+});
+</script>

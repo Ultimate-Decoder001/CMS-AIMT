@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}View Grades - AIMT College{% endblock %}
+{% block page_title %}Student Grades Management{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter me-2"></i>Filter Grades
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="departmentFilter" class="form-label">Department</label>
+                <select class="form-select" id="departmentFilter" onchange="applyFilters()">
+                    <option value="">-- All Departments --</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="yearFilter" class="form-label">Year</label>
+                <select class="form-select" id="yearFilter" onchange="applyFilters()">
+                    <option value="">-- All Years --</option>
+                    {% for year in years %}
+                    <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>Year {{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="subjectFilter" class="form-label">Subject</label>
+                <select class="form-select" id="subjectFilter" onchange="applyFilters()">
+                    <option value="">-- All Subjects --</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject }}" {% if selected_subject == subject %}selected{% endif %}>{{ subject }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>&nbsp;</label>
+                <a href="{{ url_for('manage_grades') }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-redo me-2"></i>Clear Filters
+                </a>
+            </div>
+        </div>
+        {% if selected_department or selected_year or selected_subject %}
+        <div class="mt-2">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-2"></i>
+                {% if selected_department %}Department: <strong>{{ selected_department }}</strong>{% endif %}
+                {% if selected_year and selected_department %} | {% endif %}
+                {% if selected_year %}Year: <strong>{{ selected_year }}</strong>{% endif %}
+                {% if selected_subject and (selected_department or selected_year) %} | {% endif %}
+                {% if selected_subject %}Subject: <strong>{{ selected_subject }}</strong>{% endif %}
+            </small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Grades Display Section -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-list me-2"></i>Student Grades List
+        <span class="badge bg-secondary ms-2">{{ students|length }} Student(s)</span>
+    </div>
+    <div class="card-body">
+        {% if students %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Subject</th>
+                        <th>Marks Obtained</th>
+                        <th>Max Marks</th>
+                        <th>Percentage</th>
+                        <th>Grade</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        {% set student_grades = grades|selectattr("student_id", "equalto", student.id)|list %}
+                        {% if student_grades %}
+                            {% for grade in student_grades %}
+                            <tr>
+                                {% if loop.first %}
+                                <td rowspan="{{ student_grades|length }}"><strong>{{ student.roll_number }}</strong></td>
+                                <td rowspan="{{ student_grades|length }}">{{ student.name }}</td>
+                                {% endif %}
+                                <td>{{ grade.subject }}</td>
+                                <td class="text-center"><strong>{{ grade.marks }}</strong></td>
+                                <td class="text-center">{{ grade.max_marks }}</td>
+                                <td class="text-center">
+                                    {% set percentage = (grade.marks / grade.max_marks * 100) if grade.max_marks > 0 else 0 %}
+                                    <strong>{{ "%.2f"|format(percentage) }}%</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if grade.grade in ['A+', 'A'] %}success{% elif grade.grade in ['B+', 'B'] %}info{% elif grade.grade == 'C' %}warning{% else %}danger{% endif %}">
+                                        {{ grade.grade }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if grade.remarks %}
+                                    <small class="text-muted">{{ grade.remarks[:50] }}{% if grade.remarks|length > 50 %}...{% endif %}</small>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td><strong>{{ student.roll_number }}</strong></td>
+                            <td>{{ student.name }}</td>
+                            <td colspan="6" class="text-center text-muted"><em>No grades recorded</em></td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            {% if selected_department %}
+            <i class="fas fa-info-circle me-2"></i>No students found in the selected department.
+            {% else %}
+            <i class="fas fa-info-circle me-2"></i>No students available. Please add students first.
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function applyFilters() {
+    const department = document.getElementById('departmentFilter').value;
+    const year = document.getElementById('yearFilter').value;
+    const subject = document.getElementById('subjectFilter').value;
+    
+    let url = "{{ url_for('manage_grades') }}";
+    const params = [];
+    
+    if (department) params.push('department=' + encodeURIComponent(department));
+    if (year) params.push('year=' + encodeURIComponent(year));
+    if (subject) params.push('subject=' + encodeURIComponent(subject));
+    
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+    
+    window.location.href = url;
+}
+</script>
+{% endblock %}

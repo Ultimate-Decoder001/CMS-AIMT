@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AIMT College Management System{% endblock %}</title>
+    <!-- Inline SVG favicon to avoid missing-file 404s -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b63ff'/><text x='50' y='58' font-size='50' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>A</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #f50057;
+            --bg-color: #f5f5f5;
+            --sidebar-width: 250px;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, #0d1442 100%);
+            color: white;
+            padding-top: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .sidebar-brand {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-brand h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-brand span {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 5px 10px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a.has-submenu {
+            cursor: pointer;
+        }
+
+        .fa-chevron-down {
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            width: 25px;
+            margin-right: 10px;
+        }
+        
+        .fa-chevron-down.rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        /* Submenu hidden by default; opens on hover or when JS adds .show */
+        .submenu {
+            display: none;
+        }
+
+        .sidebar-menu li:hover > .submenu {
+            display: block;
+        }
+
+        .sidebar-menu li:hover > a .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .submenu.show {
+            display: block;
+        }
+        
+        .submenu a {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .top-header {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.primary { background: var(--primary-color); }
+        .stat-icon.success { background: #00c853; }
+        .stat-icon.warning { background: #ffab00; }
+        .stat-icon.danger { background: #d50000; }
+        
+        .stat-info h3 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stat-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #0d1442;
+        }
+        
+        .btn-danger {
+            background: var(--secondary-color);
+            border: none;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            color: var(--primary-color);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .badge-pending { background: #ffab00; }
+        .badge-approved { background: #00c853; }
+        .badge-rejected { background: #d50000; }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .page-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=2">
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h4>AIMT</h4>
+            <span>College Management</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> Dashboard
+            </a></li>
+            
+            <!-- Admin/Director/Dean/HOD/HR/Registrar/AO can manage employees & leaves -->
+            {% if current_user.role in ['Registrar', 'Director', 'Dean', 'HOD', 'HR', 'Management', 'Administrative Officer'] %}
+            <li>
+                <a href="#" class="has-submenu">
+                    <i class="fas fa-users"></i> HR Management
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </a>
+                <ul class="submenu">
+                    {% if current_user.role in ['Registrar', 'Director', 'Dean', 'HR', 'Management', 'Administrative Officer'] %}
+                    <li><a href="{{ url_for('manage_employees') }}">Employees</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('leave_management') }}">Leave Management</a></li>
+                    {% if current_user.role in ['Registrar', 'Director', 'Dean', 'HOD', 'Faculty', 'HR', 'Management'] %}
+                    <li><a href="{{ url_for('manage_attendance') }}">Attendance</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+            {% endif %}
+            
+            <!-- HOD Department Management -->
+            {% if current_user.role == 'HOD' %}
+            <li>
+                <a href="#" class="has-submenu">
+                    <i class="fas fa-building"></i> Department
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{{ url_for('hod_department') }}">View Department</a></li>
+                    <li><a href="{{ url_for('assign_subject') }}">Assign Subjects</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            
+            <!-- Library staff access -->
+            {% if current_user.role in ['Library', 'Library Head', 'Librarian', 'Registrar', 'Director', 'Dean', 'Management', 'Administrative Officer'] %}
+            <li>
+                <a href="#" class="has-submenu">
+                    <i class="fas fa-book"></i> Library
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{{ url_for('manage_books') }}">Books</a></li>
+                    <li><a href="{{ url_for('issue_book') }}">Issue Book</a></li>
+                    <li><a href="{{ url_for('library_dashboard') }}">Library Dashboard</a></li>
+                    <li><a href="{{ url_for('library_transactions') }}">Transactions</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            
+            <!-- Accountant access -->
+            {% if current_user.role in ['Accountant', 'Registrar', 'Director', 'Dean', 'Management', 'Administrative Officer'] %}
+            <li>
+                <a href="#" class="has-submenu">
+                    <i class="fas fa-money-check-alt"></i> Finance
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{{ url_for('manage_salaries') }}">Salaries</a></li>
+                    <li><a href="{{ url_for('manage_expenses') }}">Expenses</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            
+            <!-- Teaching management (grades, attendance) -->
+            {% if current_user.role in ['Faculty', 'HOD', 'Registrar', 'Director', 'Dean', 'Management', 'HR'] or current_user.role %}
+            <li>
+                <a href="#" class="has-submenu">
+                    <i class="fas fa-chalkboard-teacher"></i> Teaching
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{{ url_for('manage_students') }}">Students</a></li>
+                    <li><a href="{{ url_for('student_attendance') }}">Student Attendance</a></li>
+                    <li><a href="{{ url_for('manage_grades') }}">Grades</a></li>
+                    {% if current_user.role == 'Faculty' %}
+                    <li><a href="{{ url_for('faculty_grades') }}"><i class="fas fa-pencil-alt me-2"></i>Add Grades (Assigned)</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('bulk_grades') }}">Bulk Grade Entry</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            
+            <!-- Reports for authorized roles -->
+            {% if current_user.role in ['Registrar', 'Director', 'Dean', 'HOD', 'Accountant', 'HR', 'Management'] %}
+            <li><a href="{{ url_for('reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
+            {% endif %}
+            
+            <li><a href="{{ url_for('profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="top-header d-flex align-items-center">
+            <div style="flex:1">
+                <h4 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h4>
+                <small class="text-muted">{{ current_user.role }}</small>
+            </div>
+            <div class="me-3 d-none d-md-block" style="min-width:320px;">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="search" class="form-control" placeholder="Search..." id="globalSearch">
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="me-3 position-relative">
+                    <a href="#" class="text-muted" id="notifToggle" title="Notifications"><i class="fas fa-bell fa-lg"></i></a>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notifCount" style="font-size:0.65rem;">3</span>
+                </div>
+                <div class="me-3 text-end d-none d-md-block">
+                    <strong>{{ current_user.name }}</strong>
+                    <div class="text-muted small">{{ current_user.email or current_user.role }}</div>
+                </div>
+                <div class="user-avatar">
+                    {{ current_user.name[0] }}
+                </div>
+            </div>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    {% else %}
+        {% block login_content %}{% endblock %}
+    {% endif %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/custom.js') }}?v=3"></script>
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => { alert.style.display = 'none'; });
+        }, 5000);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

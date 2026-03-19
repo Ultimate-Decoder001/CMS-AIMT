@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Management - AIMT College{% endblock %}
+{% block page_title %}Leave Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-calendar-alt me-2"></i>Leave Requests</span>
+        <a href="{{ url_for('apply_leave') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-2"></i>Apply Leave
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        {% if current_user.role in ['Registrar', 'Director', 'HOD', 'Library Head', 'Finance Officer', 'Management'] %}
+                        <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in leaves %}
+                    <tr>
+                        <td>{{ leave.employee_id }}</td>
+                        <td>{{ leave.leave_type }}</td>
+                        <td>{{ leave.start_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ leave.end_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ leave.reason[:50] }}{% if leave.reason|length > 50 %}...{% endif %}</td>
+                        <td>
+                            <span class="badge bg-{% if leave.status == 'Approved' %}success{% elif leave.status == 'Rejected' %}danger{% elif leave.status == 'Forwarded' %}info{% else %}warning{% endif %}">
+                                {% if leave.status == 'Pending' %}Pending for Forward
+                                {% elif leave.status == 'Forwarded' %}Awaiting Director Approval
+                                {% else %}{{ leave.status }}{% endif %}
+                            </span>
+                        </td>
+                        {% if current_user.role in ['Registrar', 'Director', 'HOD', 'Library Head', 'Finance Officer', 'Management'] %}
+                        {% set emp = employee_info[leave.id] %}
+                        <td>
+                            {% if leave.status == 'Pending' %}
+                                {% if current_user.role == 'HOD' and emp and emp.department == current_user.department %}
+                                    {% if emp.role == 'Student' %}
+                                        <!-- HOD approves student leaves in their department -->
+                                        <form method="POST" action="{{ url_for('approve_leave', leave_id=leave.id) }}" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('reject_leave', leave_id=leave.id) }}" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </form>
+                                    {% elif emp.role == 'Faculty' %}
+                                        <!-- HOD forwards faculty leaves in their department -->
+                                        <form method="POST" action="{{ url_for('approve_leave', leave_id=leave.id) }}" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-info" title="Forward to Director">
+                                                <i class="fas fa-arrow-right"></i> Forward
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('reject_leave', leave_id=leave.id) }}" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <small class="text-muted">No actions available</small>
+                                    {% endif %}
+                                {% elif current_user.role == 'Director' %}
+                                    <!-- Director approves or rejects any non-final leave -->
+                                    <form method="POST" action="{{ url_for('approve_leave', leave_id=leave.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('reject_leave', leave_id=leave.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                {% elif current_user.role in ['Registrar', 'Management'] %}
+                                    <!-- Registrar/Management approve directly (Registrar cannot forward HOD) -->
+                                    <form method="POST" action="{{ url_for('approve_leave', leave_id=leave.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('reject_leave', leave_id=leave.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <small class="text-muted">Processed</small>
+                                {% endif %}
+                            {% else %}
+                                <small class="text-muted">Processed</small>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

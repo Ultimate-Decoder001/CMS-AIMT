@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block login_content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - AIMT CMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #00897b;
+            --accent-color: #f50057;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0d1442 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .student-login-wrapper {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            padding: 40px 30px;
+            color: white;
+            text-align: center;
+        }
+        
+        .login-header i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .login-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .login-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .login-body {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(0, 137, 123, 0.1);
+        }
+        
+        .input-group-text {
+            background: transparent;
+            border: 2px solid #e0e0e0;
+            color: var(--secondary-color);
+        }
+        
+        .form-control:focus ~ .input-group-text {
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #006600 100%);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 8px;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 137, 123, 0.3);
+            color: white;
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .help-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .help-text a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .help-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .alt-login {
+            padding: 20px 40px;
+            background: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .alt-login a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        
+        .alt-login a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .alert-danger {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .alert-warning {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        
+        .alert-info {
+            background-color: #e1f5fe;
+            color: #01579b;
+        }
+        
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .feature-item i {
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .forgot-password a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="student-login-wrapper">
+        <div class="login-card">
+            <!-- Login Header -->
+            <div class="login-header">
+                <i class="fas fa-user-graduate"></i>
+                <h2>Student Portal</h2>
+                <p>AIMT College Management System</p>
+            </div>
+            
+            <!-- Login Body -->
+            <div class="login-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }}" role="alert">
+                                <i class="fas fa-{{ 'exclamation-circle' if category in ['error', 'danger'] else 'info-circle' }}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" id="loginForm" novalidate>
+                    <!-- Roll Number Field -->
+                    <div class="form-group">
+                        <label for="roll_number" class="form-label">
+                            <i class="fas fa-id-card"></i> Roll Number
+                        </label>
+                        <input type="text" class="form-control" id="roll_number" 
+                               name="roll_number" placeholder="e.g., STU001" 
+                               required autocomplete="off" autofocus>
+                        <small class="text-muted">Enter your student roll number (case-insensitive)</small>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" 
+                                   name="password" placeholder="Enter your password" 
+                                   required autocomplete="current-password">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="forgot-password">
+                            <a href="#contact-admin">Forgot password?</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-login" id="loginBtn">
+                        <span class="default-text">
+                            <i class="fas fa-sign-in-alt"></i> Login to Portal
+                        </span>
+                        <span class="loading" id="loadingText">
+                            <i class="fas fa-spinner fa-spin"></i> Logging in...
+                        </span>
+                    </button>
+                    
+                    <!-- Help Text -->
+                    <div class="help-text">
+                        <strong>First time login?</strong> Use your roll number and the temporary password provided by the registrar.
+                    </div>
+                </form>
+                
+                <!-- Features Section -->
+                <div class="features">
+                    <div class="feature-item">
+                        <i class="fas fa-book"></i>
+                        <p>View Results</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Mark Attendance</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <p>Apply Leave</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-bell"></i>
+                        <p>Get Updates</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alternative Login / Links -->
+            <div class="alt-login">
+                <p class="mb-0">
+                    Not a student? 
+                    <a href="{{ url_for('login') }}">Staff/Faculty Login</a>
+                </p>
+                <small class="text-muted d-block mt-2">
+                    For support, contact: <strong>admin@aimt.edu</strong>
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            document.querySelector('.default-text').style.display = 'none';
+            document.getElementById('loadingText').style.display = 'inline';
+        });
+        
+        // Auto-focus on error
+        const alerts = document.querySelectorAll('.alert-danger');
+        if (alerts.length > 0) {
+            document.getElementById('roll_number').focus();
+        }
+        
+        // Roll number validation - only alphanumeric
+        document.getElementById('roll_number').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

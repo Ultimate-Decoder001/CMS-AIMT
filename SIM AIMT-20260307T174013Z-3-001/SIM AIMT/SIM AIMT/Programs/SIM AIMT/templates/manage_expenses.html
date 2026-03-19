@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Expenses - AIMT College{% endblock %}
+{% block page_title %}Expense Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-receipt me-2"></i>Expense Records</span>
+        <a href="{{ url_for('add_expense') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-2"></i>Add Expense
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Submitted By</th>
+                        <th>Status</th>
+                        {% if current_user.role in ['Accounts', 'Management'] %}
+                        <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.id }}</td>
+                        <td>{{ expense.category }}</td>
+                        <td>{{ expense.description[:50] }}{% if expense.description|length > 50 %}...{% endif %}</td>
+                        <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                        <td>{{ expense.date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ expense.submitted_by }}</td>
+                        <td>
+                            <span class="badge bg-{% if expense.status == 'Approved' %}success{% elif expense.status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                {{ expense.status }}
+                            </span>
+                        </td>
+                        {% if current_user.role in ['Accounts', 'Management'] %}
+                        <td>
+                            {% if expense.status == 'Pending' %}
+                            <a href="{{ url_for('approve_expense', expense_id=expense.id) }}" class="btn btn-sm btn-success">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <a href="{{ url_for('reject_expense', expense_id=expense.id) }}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% else %}
+                            <small class="text-muted">Processed</small>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

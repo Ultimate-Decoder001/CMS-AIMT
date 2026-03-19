@@ -1,0 +1,202 @@
+erDiagram
+    USER ||--o{ LEAVE : "submits"
+    USER ||--o{ ATTENDANCE : "marks/records"
+    USER ||--o{ BOOK_TRANSACTION : "issues/returns"
+    USER ||--o{ SALARY : "receives"
+    USER ||--o{ EXPENSE : "submits/approves"
+    USER ||--o{ STUDENT : "owns account for"
+    USER ||--o{ NOTIFICATION : "receives"
+
+    BOOK ||--o{ BOOK_TRANSACTION : "is issued in"
+
+    STUDENT ||--o{ STUDENT_ATTENDANCE : "has"
+    STUDENT ||--o{ GRADE : "earns"
+    STUDENT ||--o{ SUBJECT_ENROLLMENT : "enrolls in"
+    SUBJECT ||--o{ SUBJECT_ENROLLMENT : "has"
+    SUBJECT ||--o{ EXAM : "includes"
+    EXAM ||--o{ MARK : "contains"
+    STUDENT ||--o{ MARK : "receives"
+    SUBJECT ||--o{ SUBJECT_ATTENDANCE : "records"
+    STUDENT ||--o{ SUBJECT_ATTENDANCE : "has"
+
+    USER {
+        string employee_id PK
+        string name
+        string email
+        string role
+        string password_hash
+        string department
+        string designation
+        string phone
+    }
+
+    LEAVE {
+        int id PK
+        string employee_id FK
+        string leave_type
+        date start_date
+        date end_date
+        string reason
+        string department
+        string status
+        string forwarded_by FK
+        string approved_by FK
+        datetime created_at
+    }
+
+    ATTENDANCE {
+        int id PK
+        string employee_id FK
+        date date
+        string status
+        string marked_by FK
+        string remarks
+        datetime created_at
+    }
+
+    BOOK {
+        int book_id PK
+        string book_code
+        string title
+        string author
+        string edition
+        string isbn
+        string category
+        int quantity
+        int available_quantity
+        string shelf_location
+        datetime created_at
+    }
+
+    BOOK_TRANSACTION {
+        int id PK
+        int book_id FK
+        string employee_id FK
+        date issue_date
+        date due_date
+        date return_date
+        string status
+    }
+
+    SALARY {
+        int id PK
+        string employee_id FK
+        int month
+        int year
+        float basic_salary
+        float hra
+        float da
+        float allowances
+        float deductions
+        float net_salary
+        string payment_status
+        date payment_date
+        datetime created_at
+    }
+
+    EXPENSE {
+        int id PK
+        string category
+        string description
+        float amount
+        date date
+        string submitted_by FK
+        string approved_by FK
+        string status
+        datetime created_at
+    }
+
+    STUDENT {
+        int id PK
+        string roll_number
+        string name
+        string first_name
+        string last_name
+        string father_name
+        string email
+        string phone
+        string course
+        int semester
+        string department
+        string user_id FK
+        datetime created_at
+    }
+
+    STUDENT_ATTENDANCE {
+        int id PK
+        int student_id FK
+        date date
+        string status
+        string marked_by FK
+        string subject
+        datetime created_at
+    }
+
+    GRADE {
+        int id PK
+        int student_id FK
+        string subject
+        float marks
+        string grade
+        int semester
+        string exam_type
+        string marked_by FK
+        datetime created_at
+    }
+
+    SUBJECT {
+        int id PK
+        string code
+        string name
+        string department
+        int semester
+        int credits
+        string faculty_id FK
+        float max_marks
+        datetime created_at
+    }
+
+    SUBJECT_ENROLLMENT {
+        int id PK
+        int student_id FK
+        int subject_id FK
+        datetime enrolled_date
+    }
+
+    EXAM {
+        int id PK
+        int subject_id FK
+        string exam_type
+        date exam_date
+        float total_marks
+        string created_by FK
+        datetime created_at
+    }
+
+    MARK {
+        int id PK
+        int exam_id FK
+        int student_id FK
+        float marks_obtained
+        string uploaded_by FK
+        datetime created_at
+    }
+
+    SUBJECT_ATTENDANCE {
+        int id PK
+        int student_id FK
+        int subject_id FK
+        date date
+        string status
+        string marked_by FK
+        datetime created_at
+    }
+
+    NOTIFICATION {
+        int id PK
+        string user_id FK
+        string title
+        string message
+        bool is_read
+        datetime created_at
+    }

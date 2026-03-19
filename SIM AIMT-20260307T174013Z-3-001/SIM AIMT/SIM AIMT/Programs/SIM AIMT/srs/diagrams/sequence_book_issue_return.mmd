@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant U as User
+    participant UI as UI (Browser)
+    participant S as Server (Flask)
+    participant DB as Database
+
+    U->>UI: Click "Issue Book"
+    UI->>S: POST /issue_book
+    S->>DB: SELECT book, user
+    DB-->>S: book + user
+    S->>DB: INSERT BookTransaction
+    S->>DB: UPDATE Book.available_quantity
+    S-->>UI: 200 OK
+    UI-->>U: Success message
+
+    U->>UI: Click "Return Book"
+    UI->>S: POST /return_book
+    S->>DB: UPDATE BookTransaction (return_date,status)
+    S->>DB: UPDATE Book.available_quantity
+    S-->>UI: 200 OK
+    UI-->>U: Success message

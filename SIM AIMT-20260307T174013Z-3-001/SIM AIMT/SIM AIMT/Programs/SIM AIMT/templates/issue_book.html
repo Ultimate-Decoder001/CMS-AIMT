@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Issue Book - AIMT College{% endblock %}
+{% block page_title %}Issue Book to Employee{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-bookmark me-2"></i>Issue Book Form
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('issue_book') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="book_id" class="form-label">Select Book *</label>
+                        <select class="form-select" id="book_id" name="book_id" required>
+                            <option value="">Select a Book</option>
+                            {% for book in books %}
+                            <option value="{{ book.book_id }}">{{ book.title }}{% if book.edition %} ({{ book.edition }}){% endif %} - {{ book.author }} (Available: {{ book.available_quantity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Select Employee *</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Select an Employee</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.employee_id }}">{{ employee.employee_id }} - {{ employee.name }} ({{ employee.role }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Books are issued for a period of 14 days. The due date will be automatically calculated.
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check-circle me-2"></i>Issue Book
+                </button>
+                <a href="{{ url_for('library_transactions') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

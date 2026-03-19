@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Apply Leave - AIMT College{% endblock %}
+{% block page_title %}Apply for Leave{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-calendar-minus me-2"></i>Leave Application Form
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('apply_leave') }}">
+            <div class="row">
+                {% if current_user.role in ['HR', 'Registrar'] %}
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="employee_id_input" class="form-label">Employee ID *</label>
+                        <input type="text" class="form-control" id="employee_id_input" placeholder="Enter Employee ID" maxlength="20" required>
+                        <input type="hidden" id="employee_id" name="employee_id" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="employee_name" class="form-label">Employee Name</label>
+                        <input type="text" class="form-control" id="employee_name" disabled placeholder="Auto-filled">
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Employee ID</label>
+                        <input type="text" class="form-control" value="{{ current_user.employee_id }}" disabled>
+                        <input type="hidden" id="employee_id" name="employee_id" value="{{ current_user.employee_id }}">
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="leave_type" class="form-label">Leave Type *</label>
+                        <select class="form-select" id="leave_type" name="leave_type" required>
+                            <option value="">Select Leave Type</option>
+                            {% for lt in leave_options %}
+                            <option value="{{ lt }}">{{ lt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Start Date *</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">End Date *</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="reason" class="form-label">Reason for Leave *</label>
+                <textarea class="form-control" id="reason" name="reason" rows="4" required placeholder="Please provide a reason for your leave application..."></textarea>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Submit Application
+                </button>
+                <a href="{{ url_for('leave_management') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const employeeIdInput = document.getElementById('employee_id_input');
+    const employeeIdHidden = document.getElementById('employee_id');
+    const employeeNameField = document.getElementById('employee_name');
+    const form = document.querySelector('form');
+    
+    // Only add listener if employee ID input field exists (for HR/Registrar)
+    if (employeeIdInput) {
+        let debounceTimer;
+        
+        employeeIdInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const employeeId = this.value.trim();
+            
+            // Clear fields if input is empty
+            if (!employeeId) {
+                employeeIdHidden.value = '';
+                employeeNameField.value = '';
+                return;
+            }
+            
+            // Debounce the API call
+            debounceTimer = setTimeout(function() {
+                // Fetch employee details from API
+                fetch(`/api/employee/${employeeId}`)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else if (response.status === 404) {
+                            throw new Error('Employee not found');
+                        } else {
+                            throw new Error('Unauthorized');
+                        }
+                    })
+                    .then(data => {
+                        // Populate the hidden employee ID and display name
+                        employeeIdHidden.value = data.employee_id;
+                        employeeNameField.value = `${data.name} (${data.role})`;
+                        employeeIdInput.classList.remove('is-invalid');
+                        employeeIdInput.classList.add('is-valid');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        employeeIdHidden.value = '';
+                        employeeNameField.value = 'Employee not found';
+                        employeeIdInput.classList.add('is-invalid');
+                        employeeIdInput.classList.remove('is-valid');
+                    });
+            }, 300);
+        });
+        
+        // Validate before form submission
+        form.addEventListener('submit', function(e) {
+            if (!employeeIdHidden.value) {
+                e.preventDefault();
+                employeeIdInput.classList.add('is-invalid');
+                alert('Please select a valid employee');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

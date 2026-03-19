@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Add Employee - AIMT College{% endblock %}
+{% block page_title %}Add New Employee{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-user-plus me-2"></i>Employee Information
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('add_employee') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Employee ID</strong> <span class="badge bg-info">Auto-Generated</span></label>
+                        <input type="text" class="form-control" id="employee_id_display" disabled placeholder="Generated based on department & designation">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="phone" name="phone">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role *</label>
+                        <select class="form-select" id="user_type" name="user_type" required>
+                            <option value="">Select Role Type</option>
+                            <option value="Teaching">Teaching</option>
+                            <option value="Non-Teaching">Non-Teaching</option>
+                        </select>
+                        <input type="hidden" id="role_hidden" name="role" value="">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Department *</label>
+                        <select class="form-select" id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <!-- Admin Departments (default) -->
+                            <option value="Human Resources" class="admin-dept">Human Resources</option>
+                            <option value="Administration" class="admin-dept">Administration</option>
+                            <option value="Management" class="admin-dept">Management</option>
+                            <option value="Accounts" class="admin-dept">Accounts</option>
+                            <option value="Library" class="admin-dept">Library</option>
+                            <!-- Teaching Departments (hidden by default) -->
+                            <option value="MCA" class="teaching-dept" style="display:none;">MCA</option>
+                            <option value="BTECH" class="teaching-dept" style="display:none;">BTECH</option>
+                            <option value="B.PHARMA" class="teaching-dept" style="display:none;">B.PHARMA</option>
+                            <option value="M.PHARMA" class="teaching-dept" style="display:none;">M.PHARMA</option>
+                            <option value="BCA" class="teaching-dept" style="display:none;">BCA</option>
+                            <option value="BBA" class="teaching-dept" style="display:none;">BBA</option>
+                            <option value="MBA" class="teaching-dept" style="display:none;">MBA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="designation" class="form-label">Designation *</label>
+                        <select class="form-select" id="designation" name="designation" required>
+                            <option value="">Select Designation</option>
+                            <!-- Human Resources Department -->
+                            <option value="HR Manager" class="hr-dept">HR Manager</option>
+                            <option value="HR Assistant" class="hr-dept">HR Assistant</option>
+                            <!-- Management Department -->
+                            <option value="Director" class="mgmt-dept" style="display:none;">Director</option>
+                            <option value="Dean" class="mgmt-dept" style="display:none;">Dean</option>
+                            <!-- Administration Department -->
+                            <option value="Registrar" class="admin-dept">Registrar</option>
+                            <option value="Administrative Officer" class="admin-dept">Administrative Officer</option>
+                            <!-- Accounts Department -->
+                            <option value="Finance Officer" class="accounts-dept" style="display:none;">Finance Officer</option>
+                            <option value="Cashier" class="accounts-dept" style="display:none;">Cashier</option>
+                            <option value="Accountant" class="accounts-dept" style="display:none;">Accountant</option>
+                            <!-- Library Department -->
+                            <option value="Library Head" class="library-dept" style="display:none;">Library Head</option>
+                            <option value="Librarian" class="library-dept" style="display:none;">Librarian</option>
+                            <!-- Teaching Departments -->
+                            <option value="Head of Department" class="teaching-desig" style="display:none;">Head of Department</option>
+                            <option value="Professor" class="teaching-desig" style="display:none;">Professor</option>
+                            <option value="Lecturer" class="teaching-desig" style="display:none;">Lecturer</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="password" class="form-label">Password *</label>
+                <input type="password" class="form-control" id="password" name="password" required minlength="6" placeholder="Enter password (min 6 characters)">
+                <small class="text-muted">This password will be used by the employee to login. They can change it later from their profile.</small>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Add Employee
+                </button>
+                <a href="{{ url_for('manage_employees') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('user_type');
+    const departmentSelect = document.getElementById('department');
+    const designationSelect = document.getElementById('designation');
+    const employeeIdDisplay = document.getElementById('employee_id_display');
+    const adminDepts = document.querySelectorAll('.admin-dept');
+    const teachingDepts = document.querySelectorAll('.teaching-dept');
+    
+    // Mapping for department + designation combinations for employee ID generation
+    const idCodeMap = {
+        'Human ResourcesHR Manager': 'HRM',
+        'Human ResourcesHR Assistant': 'HRA',
+        'ManagementDirector': 'DIR',
+        'ManagementDean': 'DEN',
+        'AdministrationRegistrar': 'REG',
+        'AdministrationAdministrative Officer': 'AAO',
+        'AccountsFinance Officer': 'FFO',
+        'AccountsCashier': 'CAS',
+        'AccountsAccountant': 'ACC',
+        'LibraryLibrary Head': 'LBH',
+        'LibraryLibrarian': 'LBN',
+    };
+
+    const roleMap = {
+        'Human ResourcesHR Manager': 'HR',
+        'Human ResourcesHR Assistant': 'HR',
+        'ManagementDirector': 'Director',
+        'ManagementDean': 'Dean',
+        'AdministrationRegistrar': 'Registrar',
+        'AdministrationAdministrative Officer': 'Administrative Officer',
+        'AccountsFinance Officer': 'Accountant',
+        'AccountsCashier': 'Accountant',
+        'AccountsAccountant': 'Accountant',
+        'LibraryLibrary Head': 'Library',
+        'LibraryLibrarian': 'Library',
+        'MCAHead of Department': 'HOD',
+        'MCAProfessor': 'Faculty',
+        'MCALecturer': 'Faculty'
+    };
+    
+    const teachingCodeMap = {
+        'Head of Department': 'HOD',
+        'Professor': 'PRO',
+        'Lecturer': 'LEA'
+    };
+    
+    // Designation groups by department
+    const designationMap = {
+        'Human Resources': ['HR Manager', 'HR Assistant'],
+        'Management': ['Director', 'Dean'],
+        'Administration': ['Registrar', 'Administrative Officer'],
+        'Accounts': ['Finance Officer', 'Cashier', 'Accountant'],
+        'Library': ['Library Head', 'Librarian'],
+        'MCA': ['Head of Department', 'Professor', 'Lecturer'],
+        'BTECH': ['Head of Department', 'Professor', 'Lecturer'],
+        'B.PHARMA': ['Head of Department', 'Professor', 'Lecturer'],
+        'M.PHARMA': ['Head of Department', 'Professor', 'Lecturer'],
+        'BCA': ['Head of Department', 'Professor', 'Lecturer'],
+        'BBA': ['Head of Department', 'Professor', 'Lecturer'],
+        'MBA': ['Head of Department', 'Professor', 'Lecturer']
+    };
+    
+    function generateEmployeeIdPreview() {
+        const dept = departmentSelect.value;
+        const desig = designationSelect.value;
+        
+        if (!dept || !desig) {
+            employeeIdDisplay.value = '';
+            return;
+        }
+        
+        let prefix = '';
+        
+        // Check for admin department + designation combination
+        const key = dept + desig;
+        if (idCodeMap[key]) {
+            prefix = idCodeMap[key];
+        } else if (desig in teachingCodeMap && ['MCA', 'BTECH', 'B.PHARMA', 'M.PHARMA', 'BCA', 'BBA', 'MBA'].includes(dept)) {
+            // Teaching department + designation
+            const deptShort = dept.replace(/\./g, '').substring(0, 3).toUpperCase();
+            const desigCode = teachingCodeMap[desig];
+            prefix = deptShort + desigCode;
+        }
+        
+        if (prefix) {
+            // Display preview with actual number format
+            employeeIdDisplay.value = prefix + '001';
+        }
+    }
+    
+    function updateDepartments() {
+        const selectedUserType = roleSelect ? roleSelect.value : (document.getElementById('user_type') || {}).value;
+        const teachingRoles = new Set(['Faculty', 'HOD']);
+
+        if (teachingRoles.has(selectedUserType) || selectedUserType === 'Teaching') {
+            // Hide admin departments, show teaching departments
+            adminDepts.forEach(opt => opt.style.display = 'none');
+            teachingDepts.forEach(opt => opt.style.display = 'block');
+        } else {
+            // Show admin departments, hide teaching departments
+            adminDepts.forEach(opt => opt.style.display = 'block');
+            teachingDepts.forEach(opt => opt.style.display = 'none');
+        }
+        // Reset selections
+        departmentSelect.value = '';
+        designationSelect.value = '';
+        employeeIdDisplay.value = '';
+        roleHidden.value = '';
+    }
+    
+    function updateDesignations() {
+        const selectedDept = departmentSelect.value;
+        const allOptions = designationSelect.querySelectorAll('option');
+        
+        // Hide all designation options except the first one
+        allOptions.forEach(opt => {
+            if (opt.value !== '') {
+                opt.style.display = 'none';
+            }
+        });
+        
+        // Show designations for selected department
+        if (selectedDept && designationMap[selectedDept]) {
+            const validDesignations = designationMap[selectedDept];
+            allOptions.forEach(opt => {
+                if (validDesignations.includes(opt.value)) {
+                    opt.style.display = 'block';
+                }
+            });
+        }
+        
+        // Reset designation selection
+        designationSelect.value = '';
+        employeeIdDisplay.value = '';
+    }
+    
+    roleSelect.addEventListener('change', updateDepartments);
+    departmentSelect.addEventListener('change', updateDesignations);
+    designationSelect.addEventListener('change', function() {
+        generateEmployeeIdPreview();
+        updateRoleDisplay();
+    });
+    // Initialize on page load
+    updateDepartments();
+
+    // Ensure the correct `role` is sent to server: derive from department+designation or fallback
+    const roleHidden = document.getElementById('role_hidden');
+    const userTypeSelect = document.getElementById('user_type');
+    const form = document.querySelector('form');
+
+    function deriveRole() {
+        const dept = departmentSelect.value;
+        const desig = designationSelect.value;
+        const key = dept + desig;
+        if (roleMap[key]) return roleMap[key];
+        if (desig in teachingCodeMap) return 'Faculty';
+        if (userTypeSelect.value === 'Teaching') return 'Faculty';
+        return 'Non-Teaching';
+    }
+
+    function updateRoleDisplay() {
+        const derived = deriveRole();
+        roleHidden.value = derived;
+        console.log('Role derived from designation: ' + derived);
+    }
+
+    // Update role when designation or department changes
+    designationSelect.addEventListener('change', updateRoleDisplay);
+    departmentSelect.addEventListener('change', updateRoleDisplay);
+
+    form.addEventListener('submit', function(e) {
+        const derived = deriveRole();
+        roleHidden.value = derived;
+        
+        // Validation: ensure all required fields are filled
+        const dept = departmentSelect.value;
+        const desig = designationSelect.value;
+        if (!dept || !desig) {
+            e.preventDefault();
+            alert('Please select both Department and Designation');
+            return false;
+        }
+        if (!roleHidden.value) {
+            e.preventDefault();
+            alert('Could not determine role. Please check department and designation selection.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

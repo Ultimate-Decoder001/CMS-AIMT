@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Department Management - AIMT College{% endblock %}
+
+{% block page_title %}Department Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">{{ department }} Department</h5>
+        </div>
+    </div>
+
+    <!-- Tabs for Students and Faculty -->
+    <ul class="nav nav-tabs mb-4" id="deptTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab">
+                <i class="fas fa-graduation-cap"></i> Students ({{ students|length }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button" role="tab">
+                <i class="fas fa-chalkboard-user"></i> Faculty ({{ faculty|length }})
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="deptTabContent">
+        <!-- Students Tab -->
+        <div class="tab-pane fade show active" id="students" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Student List</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" class="mb-3">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <select name="student_year" class="form-select">
+                                    <option value="">All Years</option>
+                                    {% for year in available_years %}
+                                        <option value="{{ year }}" {% if student_year == year|int %}selected{% endif %}>
+                                            Year {{ year }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="student_sem" class="form-select">
+                                    <option value="">All Semesters</option>
+                                    {% for sem in available_sems %}
+                                        <option value="{{ sem }}" {% if student_sem == sem %}selected{% endif %}>
+                                            Semester {{ sem }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Students Table -->
+                    {% if students %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Roll Number</th>
+                                        <th>Name</th>
+                                        <th>Year</th>
+                                        <th>Semester</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <td><strong>{{ student.roll_number }}</strong></td>
+                                            <td>{{ student.name }}</td>
+                                            <td>{{ student.course if student.course else '-' }}</td>
+                                            <td>{{ student.semester if student.semester else '-' }}</td>
+                                            <td>{{ student.email if student.email else '-' }}</td>
+                                            <td>{{ student.phone if student.phone else '-' }}</td>
+                                            <td><span class="badge bg-success">Active</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No students found with the selected filters.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Tab -->
+        <div class="tab-pane fade" id="faculty" role="tabpanel">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Faculty List</h5>
+                    <a href="{{ url_for('assign_subject') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-link"></i> Assign Subjects
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if faculty %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Designation</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Subjects Assigned</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for faculty_member in faculty %}
+                                        <tr>
+                                            <td><strong>{{ faculty_member.employee_id }}</strong></td>
+                                            <td>{{ faculty_member.name }}</td>
+                                            <td>{{ faculty_member.designation if faculty_member.designation else faculty_member.role }}</td>
+                                            <td>{{ faculty_member.email if faculty_member.email else '-' }}</td>
+                                            <td>{{ faculty_member.phone if faculty_member.phone else '-' }}</td>
+                                            <td>
+                                                {% if faculty_member.taught_subjects %}
+                                                    <small>{{ faculty_member.taught_subjects|length }} subject(s)</small>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if faculty_member.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Inactive</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No faculty members found in your department.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+flowchart TD
+    subgraph Library [Library Service]
+        L1[View Books]
+        L2[Issue Book]
+        L3[Return Book]
+        L4[Search / Filter]
+        L5[Inventory Update]
+    end
+
+    subgraph DB[(SQLite)]
+        B[Books Table]
+        T[BookTransactions Table]
+    end
+
+    L1 --> B
+    L2 --> B
+    L2 --> T
+    L3 --> T
+    L3 --> B
+    L4 --> B
+    L5 --> B

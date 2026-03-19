@@ -1,0 +1,8 @@
+#!/bin/sh
+'''exec' "/home/sonu-kumar/CMS AIMT/SIM AIMT-20260307T174013Z-3-001/SIM AIMT/SIM AIMT/Programs/SIM AIMT/linux_venv/bin/python" "$0" "$@"
+' '''
+import sys
+from flask.cli import main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(main())

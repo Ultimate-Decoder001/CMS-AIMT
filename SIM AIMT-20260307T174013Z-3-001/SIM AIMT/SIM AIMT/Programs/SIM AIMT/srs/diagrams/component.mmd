@@ -1,0 +1,23 @@
+flowchart LR
+    subgraph Browser
+        A[Web UI]
+    end
+
+    subgraph Server [Application Server]
+        B[Flask App]
+        C[Auth / Sessions]
+        D[Business Logic]
+        E[Templates + Static Assets]
+    end
+
+    subgraph Data [Persistence]
+        F[(SQLite DB)]
+        G[(File System / Instance folder)]
+    end
+
+    A -->|HTTP| B
+    B --> C
+    B --> D
+    B --> E
+    D --> F
+    D --> G

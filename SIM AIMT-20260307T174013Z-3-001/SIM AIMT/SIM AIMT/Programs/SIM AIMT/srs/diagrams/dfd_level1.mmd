@@ -1,0 +1,47 @@
+flowchart TD
+    subgraph UI [User Interface]
+        U1[Login/Logout]
+        U2[Dashboard]
+        U3[Library]
+        U4[Academics]
+        U5[Finance]
+        U6[Notifications]
+    end
+
+    subgraph App [Flask Application]
+        A1[Auth Service]
+        A2[Library Service]
+        A3[Attendance Service]
+        A4[Academics Service]
+        A5[Payroll & Expenses]
+        A6[Notification Service]
+    end
+
+    subgraph DB [(SQLite)]
+        D1[Users]
+        D2[Books + Transactions]
+        D3[Attendance]
+        D4[Students + Grades]
+        D5[Finance]
+        D6[Notifications]
+    end
+
+    U1 --> A1
+    U2 --> A1
+    U3 --> A2
+    U4 --> A4
+    U5 --> A5
+    U6 --> A6
+
+    A1 --> D1
+    A2 --> D2
+    A3 --> D3
+    A4 --> D4
+    A5 --> D5
+    A6 --> D6
+
+    %% Cross-service interaction
+    A1 --> A6
+    A2 --> A6
+    A4 --> A6
+    A5 --> A6

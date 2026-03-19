@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Library Transactions - AIMT College{% endblock %}
+{% block page_title %}Library Book Transactions{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0">Transaction History</h5>
+            <small class="text-muted">Track all book issue and return transactions</small>
+        </div>
+        <a href="{{ url_for('issue_book') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-2"></i>Issue Book
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Transaction #</th>
+                        <th>Book Title</th>
+                        <th>Employee</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if transactions %}
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td><small>#{{ transaction.id }}</small></td>
+                        <td><strong>{{ transaction.book.title if transaction.book else transaction.book_id }}</strong></td>
+                        <td>{{ transaction.employee_id }}</td>
+                        <td>{{ transaction.issue_date.strftime('%d-%m-%Y') if transaction.issue_date else '-' }}</td>
+                        <td>{{ transaction.due_date.strftime('%d-%m-%Y') if transaction.due_date else '-' }}</td>
+                        <td>
+                            {% if transaction.return_date %}
+                            {{ transaction.return_date.strftime('%d-%m-%Y') }}
+                            {% else %}
+                            <small class="text-muted">Not returned</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if transaction.status == 'Issued' %}bg-warning{% elif transaction.status == 'Returned' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ transaction.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if transaction.status == 'Issued' %}
+                            <form method="post" action="{{ url_for('return_book', transaction_id=transaction.id) }}" class="d-inline">
+                                <button class="btn btn-sm btn-outline-success" type="submit" title="Return book">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <small class="text-muted">—</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No transactions yet.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">Library Operations</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <a href="{{ url_for('manage_books') }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-book me-2"></i>Manage Books
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('issue_book') }}" class="btn btn-outline-secondary w-100 mb-2">
+                    <i class="fas fa-hand-holding me-2"></i>Issue Book
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('library_dashboard') }}" class="btn btn-outline-info w-100 mb-2">
+                    <i class="fas fa-chart-bar me-2"></i>Dashboard
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark w-100 mb-2">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

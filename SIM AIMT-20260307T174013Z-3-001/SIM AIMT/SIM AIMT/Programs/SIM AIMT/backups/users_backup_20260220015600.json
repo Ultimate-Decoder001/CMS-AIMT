@@ -1,0 +1,122 @@
+[
+  {
+    "employee_id": "ADMIN001",
+    "name": "Registrar",
+    "email": "registrar@aimt.edu",
+    "phone": "1234567890",
+    "role": "Registrar",
+    "department": "Administration",
+    "designation": "Registrar",
+    "is_active": true
+  },
+  {
+    "employee_id": "DIR002",
+    "name": "upasna pandey",
+    "email": "uppu@gmail.com",
+    "phone": "65378637498",
+    "role": "Non-Teaching",
+    "department": "Management",
+    "designation": "Director",
+    "is_active": true
+  },
+  {
+    "employee_id": "MCAHOD001",
+    "name": "Dr. shailendra vats",
+    "email": "Shailendra@gmail.com",
+    "phone": "89463546434",
+    "role": "Teaching",
+    "department": "MCA",
+    "designation": "Head of Department",
+    "is_active": true
+  },
+  {
+    "employee_id": "HR001",
+    "name": "HR Manager",
+    "email": "hr@aimt.edu",
+    "phone": "1234567891",
+    "role": "HR",
+    "department": "Human Resources",
+    "designation": "HR Manager",
+    "is_active": true
+  },
+  {
+    "employee_id": "AO001",
+    "name": "Administrative Officer",
+    "email": "ao@aimt.edu",
+    "phone": "1234567900",
+    "role": "Administrative Officer",
+    "department": "Administration",
+    "designation": "Administrative Officer",
+    "is_active": true
+  },
+  {
+    "employee_id": "DEAN001",
+    "name": "Dean",
+    "email": "dean@aimt.edu",
+    "phone": "1234567898",
+    "role": "Dean",
+    "department": "Administration",
+    "designation": "Dean",
+    "is_active": true
+  },
+  {
+    "employee_id": "HODCS01",
+    "name": "HOD Computer Science",
+    "email": "hodcs@aimt.edu",
+    "phone": "1234567898",
+    "role": "HOD",
+    "department": "Computer Science",
+    "designation": "Head of Department",
+    "is_active": true
+  },
+  {
+    "employee_id": "ACC001",
+    "name": "Finance Officer",
+    "email": "finance@aimt.edu",
+    "phone": "1234567892",
+    "role": "Finance Officer",
+    "department": "Accounts",
+    "designation": "Finance Officer",
+    "is_active": true
+  },
+  {
+    "employee_id": "LIB001",
+    "name": "Library Head",
+    "email": "library@aimt.edu",
+    "phone": "1234567893",
+    "role": "Library Head",
+    "department": "Library",
+    "designation": "Librarian",
+    "is_active": true
+  },
+  {
+    "employee_id": "TCH001",
+    "name": "John Smith",
+    "email": "john@aimt.edu",
+    "phone": "1234567894",
+    "role": "Faculty",
+    "department": "Computer Science",
+    "designation": "Professor",
+    "is_active": true
+  },
+  {
+    "employee_id": "NCT001",
+    "name": "Mike Johnson",
+    "email": "mike@aimt.edu",
+    "phone": "1234567895",
+    "role": "Non-Teaching",
+    "department": "Administration",
+    "designation": "Office Assistant",
+    "is_active": true
+  },
+  {
+    "employee_id": "EATDS5713",
+    "name": "New Employee",
+    "email": "employee@aimt.edu",
+    "phone": "1234567896",
+    "role": "Faculty",
+    "department": "Computer Science",
+    "designation": "Lecturer",
+    "is_active": true
+  }
+]

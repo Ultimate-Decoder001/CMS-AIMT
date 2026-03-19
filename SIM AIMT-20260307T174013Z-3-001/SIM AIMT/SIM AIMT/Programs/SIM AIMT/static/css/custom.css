@@ -1,0 +1,68 @@
+/* Custom UI/UX enhancements for AIMT theme */
+:root {
+    --accent-1: #0b63ff;
+    --accent-2: #6a1b9a;
+    --muted: #6c757d;
+}
+
+/* small improvements to existing layout */
+.top-header {
+    background: linear-gradient(90deg, rgba(11,99,255,0.06), rgba(106,27,154,0.03));
+    border-left: 6px solid var(--accent-1);
+}
+
+.sidebar-brand h4 {
+    letter-spacing: 0.6px;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    transition: transform 0.25s ease;
+}
+
+.card-header {
+    background: linear-gradient(90deg, rgba(11,99,255,0.04), rgba(106,27,154,0.02));
+}
+
+.user-avatar {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    box-shadow: 0 4px 12px rgba(10, 10, 30, 0.12);
+}
+
+.btn-outline-primary {
+    border-radius: 8px;
+}
+
+/* subtle card accent */
+.card { overflow: hidden; }
+.card::after {
+    content: '';
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    margin-top: -20px;
+    opacity: 0.06;
+}
+
+/* responsive tweaks */
+@media (max-width: 768px) {
+    .stat-card { padding: 12px; }
+}
+
+/* tiny animation for badges */
+.badge { transition: transform 0.15s ease; }
+.badge:hover { transform: scale(1.03); }
+
+.chart-card { min-height: 260px; display:flex; align-items:center; justify-content:center; }
+
+/* header search and notification styles */
+#globalSearch { border-radius: 28px; }
+#notifCount { transform: translate(20%, -40%); }
+
+/* animated counter */
+.counter { font-variant-numeric: tabular-nums; }
+
+/* small responsive tweaks */
+@media (max-width: 992px) {
+    #globalSearch { display:none; }
+}

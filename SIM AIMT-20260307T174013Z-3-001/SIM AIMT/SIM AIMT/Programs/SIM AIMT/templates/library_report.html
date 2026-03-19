@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Library Report - AIMT College{% endblock %}
+{% block page_title %}Library Report{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>Total Books</h5>
+                <h2>{{ total_books }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Available Books</h5>
+                <h2>{{ available_books }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5>Books Issued</h5>
+                <h2>{{ books_issued }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- summary chart -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card chart-card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie me-2"></i>Library Overview
+            </div>
+            <div class="card-body" style="position: relative; height: 280px;">
+                <canvas id="libraryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Top issued books chart -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <i class="fas fa-book-open me-2"></i>Top Issued Books
+                    </div>
+                    <div class="card-body" style="position: relative; height: 280px;">
+                        <canvas id="topBooksChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+    <div class="card-header">
+        <i class="fas fa-history me-2"></i>Transaction History
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Book</th>
+                        <th>Employee</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.book.title }}</td>
+                        <td>{{ transaction.employee_id }}</td>
+                        <td>{{ transaction.issue_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ transaction.due_date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            {% if transaction.return_date %}
+                            {{ transaction.return_date.strftime('%d-%m-%Y') }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if transaction.status == 'Issued' %}primary{% elif transaction.status == 'Returned' %}success{% else %}danger{% endif %}">
+                                {{ transaction.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        var el = document.getElementById('libraryChart');
+        if (!el) return;
+        var ctx = el.getContext('2d');
+        var data = [
+            {{ total_books or 0 }},
+            {{ available_books or 0 }},
+            {{ books_issued or 0 }}
+        ];
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Total','Available','Issued'],
+                datasets: [{
+                    data: data,
+                    backgroundColor: ['#0b63ff','#00c853','#ffab00']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // top books bar chart
+        var el2 = document.getElementById('topBooksChart');
+        if (el2) {
+            var ctx2 = el2.getContext('2d');
+            var labels = [
+                {% if top_books %}
+                {% for b in top_books %}"{{ b[0]|escapejs }}"{% if not loop.last %}, {% endif %}{% endfor %}
+                {% else %}
+                
+                {% endif %}
+            ];
+            var counts = [
+                {% if top_books %}
+                {% for b in top_books %}{{ b[1] }}{% if not loop.last %}, {% endif %}{% endfor %}
+                {% else %}
+                
+                {% endif %}
+            ];
+
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Issues',
+                        data: counts,
+                        backgroundColor: '#1976d2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

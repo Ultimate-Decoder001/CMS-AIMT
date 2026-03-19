@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Subjects - AIMT College{% endblock %}
+
+{% block page_title %}Assign Subjects to Faculty{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Assign Subjects</h5>
+                    <small>Assign teaching subjects to faculty members in your department</small>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="assignForm">
+                        <div class="mb-3">
+                            <label for="subject_id" class="form-label">Select Subject<span class="text-danger">*</span></label>
+                            <select name="subject_id" id="subject_id" class="form-select" required>
+                                <option value="">-- Choose a Subject --</option>
+                                {% for subject in subjects %}
+                                    <option value="{{ subject.id }}">
+                                        {{ subject.code }} - {{ subject.name }}
+                                        (Sem {{ subject.semester }})
+                                        {% if subject.faculty %}
+                                            - Assigned to: {{ subject.faculty.name }}
+                                        {% else %}
+                                            - Unassigned
+                                        {% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Select the subject you want to assign</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faculty_id" class="form-label">Select Faculty<span class="text-danger">*</span></label>
+                            <select name="faculty_id" id="faculty_id" class="form-select" required>
+                                <option value="">-- Choose Faculty Member --</option>
+                                {% for faculty_member in faculty %}
+                                    <option value="{{ faculty_member.employee_id }}">
+                                        {{ faculty_member.employee_id }} - {{ faculty_member.name }}
+                                        {% if faculty_member.taught_subjects %}
+                                            ({{ faculty_member.taught_subjects|length }} subjects)
+                                        {% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Select the faculty member to assign this subject to</small>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-check"></i> Assign Subject
+                            </button>
+                            <a href="{{ url_for('hod_department') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Department
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Subjects Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% if subjects %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Semester</th>
+                                        <th>Assigned Faculty</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in subjects %}
+                                        <tr>
+                                            <td><strong>{{ subject.code }}</strong></td>
+                                            <td>{{ subject.name }}</td>
+                                            <td>{{ subject.semester }}</td>
+                                            <td>
+                                                {% if subject.faculty %}
+                                                    {{ subject.faculty.name }}
+                                                {% else %}
+                                                    <span class="text-danger">Unassigned</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if subject.faculty %}
+                                                    <span class="badge bg-success">Assigned</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No subjects found in your department. Please create subjects first.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

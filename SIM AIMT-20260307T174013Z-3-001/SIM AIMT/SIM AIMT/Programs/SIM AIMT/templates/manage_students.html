@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Students - AIMT College{% endblock %}
+{% block page_title %}Student Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-user-graduate me-2"></i>All Students</span>
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-2"></i>Add Student
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Course</th>
+                        <th>Semester</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td><strong>{{ student.roll_number }}</strong></td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.phone }}</td>
+                        <td>{{ student.course }}</td>
+                        <td>{{ student.semester }}</td>
+                        <td>
+                            <a href="{{ url_for('student_login_credentials', student_id=student.id) }}" class="btn btn-sm btn-info" title="View Login Credentials">
+                                <i class="fas fa-key"></i> Credentials
+                            </a>
+                            <a href="{{ url_for('reset_student_password', student_id=student.id) }}" class="btn btn-sm btn-warning" title="Reset Password">
+                                <i class="fas fa-refresh"></i> Reset Password
+                            </a>
+                            <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{{ url_for('delete_student', student_id=student.id) }}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure?')">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

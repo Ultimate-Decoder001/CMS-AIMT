@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Grade Entry - AIMT College{% endblock %}
+{% block page_title %}Bulk Student Grades Entry{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <i class="fas fa-file-upload me-2"></i>Bulk Grade Entry
+    </div>
+    <div class="card-body">
+        <!-- Filter Section -->
+        <div class="row mb-4 p-3 bg-light rounded">
+            <div class="col-md-3">
+                <label for="yearFilter" class="form-label fw-bold">Academic Year</label>
+                <select class="form-select" id="yearFilter" onchange="updateDependencies()">
+                    <option value="">-- Select Year --</option>
+                    {% for year in years %}
+                    <option value="{{ year.value }}">{{ year.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="departmentFilter" class="form-label fw-bold">Department</label>
+                <select class="form-select" id="departmentFilter" onchange="updateDependencies()">
+                    <option value="">-- Select Department --</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="subjectFilter" class="form-label fw-bold">Subject</label>
+                <select class="form-select" id="subjectFilter" onchange="loadStudents()">
+                    <option value="">-- Select Subject --</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="examTypeFilter" class="form-label fw-bold">Exam Type</label>
+                <select class="form-select" id="examTypeFilter">
+                    <option value="">-- Select Exam Type --</option>
+                    <option value="Mid-term">Mid-term</option>
+                    <option value="Final">Final</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Quiz">Quiz</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Faculty Name Display -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="alert alert-info" id="facultyInfo" style="display:none;">
+                    <i class="fas fa-user me-2"></i><strong>Faculty:</strong> <span id="facultyName"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-info" id="maxMarksInfo" style="display:none;">
+                    <i class="fas fa-bookmark me-2"></i><strong>Max Marks:</strong> <span id="maxMarksValue"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grades Table -->
+        <div id="gradesContainer" style="display:none;">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="gradesTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="15%">Roll No</th>
+                            <th width="35%">Student Name</th>
+                            <th width="15%">Marks</th>
+                            <th width="35%">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-danger" onclick="resetForm()">
+                    <i class="fas fa-redo me-2"></i>Reset
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" onclick="saveGrades()">
+                    <i class="fas fa-save me-2"></i>Save All Grades
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Select Year, Department, and Subject to view students</p>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="spinner-border" role="status" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+    <span class="visually-hidden">Loading...</span>
+</div>
+
+<script>
+// Store current selections
+let currentSubject = null;
+let currentFaculty = null;
+let maxMarks = 100;
+
+// Update subjects when year or department changes
+async function updateDependencies() {
+    const year = document.getElementById('yearFilter').value;
+    const department = document.getElementById('departmentFilter').value;
+    
+    // Reset dependent fields
+    document.getElementById('subjectFilter').innerHTML = '<option value="">-- Select Subject --</option>';
+    document.getElementById('gradesContainer').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('facultyInfo').style.display = 'none';
+    document.getElementById('maxMarksInfo').style.display = 'none';
+    
+    if (!year || !department) {
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const response = await fetch(`/api/subjects?department=${encodeURIComponent(department)}&year=${year}`);
+        const subjects = await response.json();
+        
+        const subjectSelect = document.getElementById('subjectFilter');
+        subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+        
+        subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.id;
+            option.textContent = `${subject.code} - ${subject.name}`;
+            option.dataset.faculty = subject.faculty_name;
+            option.dataset.maxMarks = subject.max_marks;
+            subjectSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading subjects:', error);
+        alert('Failed to load subjects');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Load students when subject is selected
+async function loadStudents() {
+    const year = document.getElementById('yearFilter').value;
+    const department = document.getElementById('departmentFilter').value;
+    const subjectId = document.getElementById('subjectFilter').value;
+    const subjectSelect = document.getElementById('subjectFilter');
+    const selectedOption = subjectSelect.options[subjectSelect.selectedIndex];
+    
+    if (!year || !department || !subjectId) {
+        document.getElementById('gradesContainer').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('facultyInfo').style.display = 'none';
+        document.getElementById('maxMarksInfo').style.display = 'none';
+        return;
+    }
+    
+    // Update faculty name
+    currentFaculty = selectedOption.dataset.faculty;
+    maxMarks = parseFloat(selectedOption.dataset.maxMarks) || 100;
+    document.getElementById('facultyName').textContent = currentFaculty;
+    document.getElementById('maxMarksValue').textContent = maxMarks;
+    document.getElementById('facultyInfo').style.display = 'block';
+    document.getElementById('maxMarksInfo').style.display = 'block';
+    
+    try {
+        showLoading(true);
+        const response = await fetch(`/api/students?department=${encodeURIComponent(department)}&year=${year}&subject_id=${subjectId}`);
+        const students = await response.json();
+        
+        if (students.length === 0) {
+            document.getElementById('gradesContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            return;
+        }
+        
+        // Populate table
+        const tbody = document.getElementById('studentsBody');
+        tbody.innerHTML = '';
+        
+        students.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${student.roll_number}</strong></td>
+                <td>${student.name}</td>
+                <td>
+                    <input type="number" class="form-control form-control-sm marks-input" 
+                           data-student-id="${student.id}" 
+                           min="0" max="${maxMarks}" step="0.01" 
+                           placeholder="Enter marks">
+                </td>
+                <td>
+                    <textarea class="form-control form-control-sm remarks-input" 
+                              data-student-id="${student.id}" 
+                              rows="1" placeholder="Add remarks (optional)"></textarea>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        document.getElementById('gradesContainer').style.display = 'block';
+        document.getElementById('emptyState').style.display = 'none';
+        currentSubject = subjectId;
+    } catch (error) {
+        console.error('Error loading students:', error);
+        alert('Failed to load students');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Save all grades
+async function saveGrades() {
+    const subjectId = document.getElementById('subjectFilter').value;
+    const examType = document.getElementById('examTypeFilter').value;
+    
+    if (!subjectId || !examType) {
+        alert('Please select Subject and Exam Type');
+        return;
+    }
+    
+    // Collect grades data
+    const gradesData = [];
+    document.querySelectorAll('.marks-input').forEach(input => {
+        const marks = input.value.trim();
+        if (marks) {
+            gradesData.push({
+                student_id: input.dataset.studentId,
+                marks: parseFloat(marks),
+                remarks: document.querySelector(`.remarks-input[data-student-id="${input.dataset.studentId}"]`).value || ''
+            });
+        }
+    });
+    
+    if (gradesData.length === 0) {
+        alert('Please enter marks for at least one student');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const response = await fetch('/bulk_grades', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                subject_id: parseInt(subjectId),
+                exam_type: examType,
+                max_marks: maxMarks,
+                grades_data: gradesData
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showSuccessMessage(`✓ ${result.message}`);
+            setTimeout(() => {
+                resetForm();
+            }, 1500);
+        } else {
+            alert('Error: ' + (result.error || 'Failed to save grades'));
+        }
+    } catch (error) {
+        console.error('Error saving grades:', error);
+        alert('Failed to save grades: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Reset form
+function resetForm() {
+    document.getElementById('yearFilter').value = '';
+    document.getElementById('departmentFilter').value = '';
+    document.getElementById('subjectFilter').value = '';
+    document.getElementById('examTypeFilter').value = '';
+    document.getElementById('gradesContainer').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('facultyInfo').style.display = 'none';
+    document.getElementById('maxMarksInfo').style.display = 'none';
+    document.getElementById('studentsBody').innerHTML = '';
+}
+
+// Show/hide loading indicator
+function showLoading(show) {
+    document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+}
+
+// Show success message
+function showSuccessMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" onclick="this.parentElement.style.display='none';"></button>
+    `;
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '2000';
+    alertDiv.style.minWidth = '300px';
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentElement) {
+            alertDiv.parentElement.removeChild(alertDiv);
+        }
+    }, 3000);
+}
+
+// Auto-save mark percentages for visual feedback
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('marks-input')) {
+        const marks = parseFloat(e.target.value) || 0;
+        const percentage = maxMarks > 0 ? ((marks / maxMarks) * 100).toFixed(1) : 0;
+        e.target.title = `${percentage}%`;
+    }
+});
+</script>
+
+<style>
+.marks-input, .remarks-input {
+    font-size: 0.95rem;
+}
+
+.marks-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+#gradesTable thead {
+    position: sticky;
+    top: 0;
+}
+
+.table-responsive {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+</style>
+{% endblock %}

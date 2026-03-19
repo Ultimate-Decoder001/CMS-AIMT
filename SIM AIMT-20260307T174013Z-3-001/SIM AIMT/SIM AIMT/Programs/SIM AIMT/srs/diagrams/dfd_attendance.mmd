@@ -1,0 +1,17 @@
+flowchart TD
+    subgraph Attendance [Attendance Service]
+        A1[Mark Attendance]
+        A2[View Attendance]
+        A3[Generate Reports]
+    end
+
+    subgraph DB[(SQLite)]
+        AT[Attendance Table]
+        S[Students Table]
+    end
+
+    A1 --> AT
+    A2 --> AT
+    A2 --> S
+    A3 --> AT
+    A3 --> S

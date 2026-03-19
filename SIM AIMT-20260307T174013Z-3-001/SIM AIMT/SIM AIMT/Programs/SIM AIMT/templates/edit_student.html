@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student - AIMT College{% endblock %}
+{% block page_title %}Edit Student Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-user-graduate me-2"></i>Student Information
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('edit_student', student_id=student.id) }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="roll_number" class="form-label">Roll Number</label>
+                        <input type="text" class="form-control" id="roll_number" value="{{ student.roll_number }}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                    value="{{ student.first_name or '' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                    value="{{ student.last_name or '' }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="father_name" class="form-label">Father's Name *</label>
+                        <input type="text" class="form-control" id="father_name" name="father_name" 
+                            value="{{ student.father_name or '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name (auto-filled)</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                            value="{{ student.name or '' }}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                            value="{{ student.email or '' }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" pattern="\d{10}" maxlength="10" inputmode="numeric" class="form-control" id="phone" name="phone" 
+                            value="{{ student.phone or '' }}">
+                        <div class="form-text">Enter a 10-digit mobile number (numbers only).</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Department *</label>
+                        <select class="form-select" id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="MCA" {% if student.department == 'MCA' %}selected{% endif %}>MCA</option>
+                            <option value="BTECH" {% if student.department == 'BTECH' %}selected{% endif %}>BTECH</option>
+                            <option value="BPH" {% if student.department == 'BPH' %}selected{% endif %}>B.PHARMA</option>
+                            <option value="MPH" {% if student.department == 'MPH' %}selected{% endif %}>M.PHARMA</option>
+                            <option value="BCA" {% if student.department == 'BCA' %}selected{% endif %}>BCA</option>
+                            <option value="MBA" {% if student.department == 'MBA' %}selected{% endif %}>MBA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="semester" class="form-label">Semester *</label>
+                        <select class="form-select" id="semester" name="semester" required>
+                            <option value="">Select Semester</option>
+                            <option value="1" {% if student.semester == 1 %}selected{% endif %}>Semester 1</option>
+                            <option value="2" {% if student.semester == 2 %}selected{% endif %}>Semester 2</option>
+                            <option value="3" {% if student.semester == 3 %}selected{% endif %}>Semester 3</option>
+                            <option value="4" {% if student.semester == 4 %}selected{% endif %}>Semester 4</option>
+                            <option value="5" {% if student.semester == 5 %}selected{% endif %}>Semester 5</option>
+                            <option value="6" {% if student.semester == 6 %}selected{% endif %}>Semester 6</option>
+                            <option value="7" {% if student.semester == 7 %}selected{% endif %}>Semester 7</option>
+                            <option value="8" {% if student.semester == 8 %}selected{% endif %}>Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Update Student
+                </button>
+                <a href="{{ url_for('manage_students') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const firstNameInput = document.getElementById('first_name');
+    const lastNameInput = document.getElementById('last_name');
+    const nameInput = document.getElementById('name');
+    
+    function updateFullName() {
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
+        nameInput.value = (firstName + ' ' + lastName).trim();
+    }
+    
+    if (firstNameInput && lastNameInput && nameInput) {
+        firstNameInput.addEventListener('input', updateFullName);
+        lastNameInput.addEventListener('input', updateFullName);
+        // Trigger on load to initialize
+        updateFullName();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Report - AIMT College{% endblock %}
+{% block page_title %}Employee Report{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-2"></i>Employee Report
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.employee_id }}</td>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.phone }}</td>
+                        <td>{{ employee.role }}</td>
+                        <td>{{ employee.department }}</td>
+                        <td>{{ employee.designation }}</td>
+                        <td>
+                            {% if employee.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Add Grades - AIMT College{% endblock %}
+{% block page_title %}Add Student Grades{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-edit me-2"></i>Assign Grades to Students
+    </div>
+    <div class="card-body">
+        {% if subjects %}
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label for="subjectFilter" class="form-label">Select Subject *</label>
+                <select class="form-select" id="subjectFilter" onchange="updateStudents()">
+                    <option value="">-- Select Subject --</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}" data-max-marks="{{ subject.max_marks }}">
+                        {{ subject.code }} - {{ subject.name }} ({{ subject.department }}, Sem {{ subject.semester }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="examTypeFilter" class="form-label">Exam Type *</label>
+                <select class="form-select" id="examTypeFilter">
+                    <option value="">-- Select Exam Type --</option>
+                    <option value="Mid-term">Mid-term</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Final">Final</option>
+                    <option value="Practical">Practical</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="facultyName" class="form-label">Faculty Name</label>
+                <input type="text" class="form-control" id="facultyName" value="{{ current_user.name }}" disabled>
+            </div>
+        </div>
+
+        <!-- Max Marks Alert -->
+        <div id="maxMarksAlert" class="alert alert-info" role="alert" style="display:none;">
+            <i class="fas fa-info-circle me-2"></i>
+            Maximum Marks: <strong id="maxMarksValue">100</strong>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="spinner-border text-primary" role="status" style="display:none;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+
+        <!-- Students Table -->
+        <div id="studentsTableContainer" style="display:none;" class="mt-4">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Student Name</th>
+                            <th>Marks Obtained / Max</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-lg" onclick="saveGrades()">
+                    <i class="fas fa-save me-2"></i>Save All Grades
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+                    <i class="fas fa-redo me-2"></i>Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Success!</strong> <span id="successText"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>No Subjects Assigned</strong><br>
+            You don't have any subjects assigned yet. Please contact your HOD to assign subjects to you.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+let maxMarks = 100;
+
+function updateStudents() {
+    const subjectId = document.getElementById('subjectFilter').value;
+    const examType = document.getElementById('examTypeFilter').value;
+
+    if (!subjectId || !examType) {
+        document.getElementById('studentsTableContainer').style.display = 'none';
+        document.getElementById('maxMarksAlert').style.display = 'none';
+        return;
+    }
+
+    // Get max marks from selected subject option
+    const subjectOption = document.querySelector(`#subjectFilter option[value="${subjectId}"]`);
+    maxMarks = parseFloat(subjectOption.dataset.maxMarks) || 100;
+    document.getElementById('maxMarksValue').textContent = maxMarks;
+    document.getElementById('maxMarksAlert').style.display = 'block';
+
+    showLoading(true);
+    
+    // Fetch students for this subject via API
+    fetch(`/api/faculty_students?subject_id=${subjectId}`)
+        .then(response => response.json())
+        .then(students => {
+            populateStudentsTable(students);
+            showLoading(false);
+        })
+        .catch(error => {
+            console.error('Error fetching students:', error);
+            alert('Error loading students: ' + error.message);
+            showLoading(false);
+        });
+}
+
+function populateStudentsTable(students) {
+    const tbody = document.getElementById('studentsBody');
+    tbody.innerHTML = '';
+
+    if (students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No students enrolled in this subject</td></tr>';
+        document.getElementById('studentsTableContainer').style.display = 'block';
+        return;
+    }
+
+    students.forEach(student => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${student.roll_number}</strong></td>
+            <td>${student.name}</td>
+            <td>
+                <div class="input-group">
+                    <input type="number" class="form-control marks-input" 
+                           data-student-id="${student.id}" 
+                           min="0" max="${maxMarks}" step="0.01" 
+                           placeholder="Marks">
+                    <span class="input-group-text">/ ${maxMarks}</span>
+                </div>
+            </td>
+            <td>
+                <textarea class="form-control remarks-input" 
+                          data-student-id="${student.id}" 
+                          rows="2" placeholder="Optional remarks..." 
+                          maxlength="200" style="font-size: 0.85rem;"></textarea>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.getElementById('studentsTableContainer').style.display = 'block';
+}
+
+async function saveGrades() {
+    const subjectId = document.getElementById('subjectFilter').value;
+    const examType = document.getElementById('examTypeFilter').value;
+
+    if (!subjectId || !examType) {
+        alert('Please select Subject and Exam Type');
+        return;
+    }
+
+    // Collect grades data
+    const gradesData = [];
+    document.querySelectorAll('.marks-input').forEach(input => {
+        const marks = input.value.trim();
+        if (marks) {
+            gradesData.push({
+                student_id: input.dataset.studentId,
+                marks: parseFloat(marks),
+                remarks: document.querySelector(`.remarks-input[data-student-id="${input.dataset.studentId}"]`).value || ''
+            });
+        }
+    });
+
+    if (gradesData.length === 0) {
+        alert('Please enter marks for at least one student');
+        return;
+    }
+
+    try {
+        showLoading(true);
+        const response = await fetch('/faculty_grades', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                subject_id: parseInt(subjectId),
+                exam_type: examType,
+                max_marks: maxMarks,
+                grades_data: gradesData
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showSuccessMessage(`✓ ${result.message}`);
+            setTimeout(() => {
+                resetForm();
+            }, 1500);
+        } else {
+            alert('Error: ' + (result.error || 'Failed to save grades'));
+        }
+    } catch (error) {
+        console.error('Error saving grades:', error);
+        alert('Failed to save grades: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+function resetForm() {
+    document.getElementById('subjectFilter').value = '';
+    document.getElementById('examTypeFilter').value = '';
+    document.getElementById('studentsTableContainer').style.display = 'none';
+    document.getElementById('maxMarksAlert').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
+}
+
+function showLoading(show) {
+    document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+}
+
+function showSuccessMessage(message) {
+    const msgElement = document.getElementById('successMessage');
+    document.getElementById('successText').textContent = message;
+    msgElement.style.display = 'block';
+}
+</script>
+{% endblock %}

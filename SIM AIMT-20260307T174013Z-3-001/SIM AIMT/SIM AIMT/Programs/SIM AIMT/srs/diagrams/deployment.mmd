@@ -1,0 +1,29 @@
+flowchart LR
+    subgraph Client
+        U[User Browser]
+    end
+
+    subgraph Server[Application Server]
+        A[Flask App (WSGI)]
+        N[Gunicorn / uWSGI]
+        W[Static Files]
+    end
+
+    subgraph Data[Persistence]
+        DB[(SQLite DB)]
+        FS[(Instance / Backups)]
+    end
+
+    subgraph Infra[Infrastructure]
+        H[Host / VM / Container]
+        L[Load Balancer (optional)]
+    end
+
+    U -->|HTTP/HTTPS| L
+    L --> A
+    A --> N
+    N --> DB
+    N --> FS
+    H --> A
+    H --> DB
+    H --> FS

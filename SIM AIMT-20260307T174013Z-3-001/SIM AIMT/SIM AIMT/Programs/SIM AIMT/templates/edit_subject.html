@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Subject - AIMT{% endblock %}
+{% block page_title %}Edit Subject{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label for="code" class="form-label">Subject Code</label>
+                <input type="text" class="form-control" id="code" name="code" value="{{ subject.code }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ subject.name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="department" class="form-label">Department</label>
+                <input type="text" class="form-control" id="department" name="department" value="{{ subject.department }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="semester" class="form-label">Semester</label>
+                <input type="number" class="form-control" id="semester" name="semester" value="{{ subject.semester }}" min="1" required>
+            </div>
+            <div class="mb-3">
+                <label for="session_year" class="form-label">Session / Year</label>
+                <input type="text" class="form-control" id="session_year" name="session_year" value="{{ subject.session_year or '' }}" placeholder="e.g. 2025-26">
+            </div>
+            <div class="mb-3">
+                <label for="faculty_id" class="form-label">Assigned Faculty</label>
+                <select class="form-select" id="faculty_id" name="faculty_id">
+                    <option value="">-- none --</option>
+                    {% for f in faculty %}
+                    <option value="{{ f.employee_id }}" {% if subject.faculty_id == f.employee_id %}selected{% endif %}>{{ f.name }} ({{ f.department }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="credits" class="form-label">Credits</label>
+                <input type="number" class="form-control" id="credits" name="credits" value="{{ subject.credits }}" min="1">
+            </div>
+            <div class="mb-3">
+                <label for="max_marks" class="form-label">Max Marks</label>
+                <input type="number" class="form-control" id="max_marks" name="max_marks" value="{{ subject.max_marks }}" step="0.1">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{{ url_for('manage_subjects') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

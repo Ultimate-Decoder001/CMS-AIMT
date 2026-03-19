@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance - AIMT College{% endblock %}
+{% block page_title %}Employee Attendance{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-clipboard-check me-2"></i>Mark Attendance - {{ today.strftime('%d-%m-%Y') }}
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('mark_attendance') }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Employee</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Select Employee</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.employee_id }}">{{ employee.employee_id }} - {{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Late">Late</option>
+                            <option value="Half Day">Half Day</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" value="{{ today }}" required>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-check"></i> Mark
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-history me-2"></i>Today's Attendance
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Marked By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                    <tr>
+                        <td>{{ record.employee_id }}</td>
+                        {% set employee = employees|selectattr("employee_id", "equalto", record.employee_id)|first %}
+                        <td>{{ employee.name if employee else 'N/A' }}</td>
+                        <td>{{ employee.department if employee else 'N/A' }}</td>
+                        <td>
+                            <span class="badge bg-{% if record.status == 'Present' %}success{% elif record.status == 'Absent' %}danger{% elif record.status == 'Late' %}warning{% else %}info{% endif %}">
+                                {{ record.status }}
+                            </span>
+                        </td>
+                        <td>{{ record.marked_by }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No attendance records for today</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - AIMT College{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-user-circle me-2"></i>My Profile
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle fa-7x text-primary"></i>
+                </div>
+                <h4 class="mt-3">{{ current_user.name }}</h4>
+                <span class="badge bg-primary">{{ current_user.role }}</span>
+            </div>
+            <div class="col-md-8">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Employee ID:</strong></td>
+                        <td>{{ current_user.employee_id }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Name:</strong></td>
+                        <td>{{ current_user.name }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>{{ current_user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phone:</strong></td>
+                        <td>{{ current_user.phone or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Department:</strong></td>
+                        <td>{{ current_user.department or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Designation:</strong></td>
+                        <td>{{ current_user.designation or 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            {% if current_user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h5>Change Password</h5>
+            <form method="POST" action="{{ url_for('change_password') }}">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Change Password
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

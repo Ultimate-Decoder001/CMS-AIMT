@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Book - AIMT College{% endblock %}
+{% block page_title %}Edit Book{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-book-edit me-2"></i>Edit Book Information
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('edit_book', book_id=book.book_id) }}">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Book Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ book.title }}" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Author *</label>
+                        <input type="text" class="form-control" id="author" name="author" value="{{ book.author }}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="edition" class="form-label">Edition</label>
+                        <input type="text" class="form-control" id="edition" name="edition" value="{{ book.edition or '' }}" placeholder="e.g., 2nd">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label">ISBN</label>
+                        <input type="text" class="form-control" id="isbn" name="isbn" value="{{ book.isbn }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="Programming" {% if book.category == 'Programming' %}selected{% endif %}>Programming</option>
+                            <option value="Computer Science" {% if book.category == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+                            <option value="Database" {% if book.category == 'Database' %}selected{% endif %}>Database</option>
+                            <option value="Web" {% if book.category == 'Web' %}selected{% endif %}>Web Development</option>
+                            <option value="AI" {% if book.category == 'AI' %}selected{% endif %}>Artificial Intelligence</option>
+                            <option value="Networking" {% if book.category == 'Networking' %}selected{% endif %}>Networking</option>
+                            <option value="Mathematics" {% if book.category == 'Mathematics' %}selected{% endif %}>Mathematics</option>
+                            <option value="Other" {% if book.category == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity *</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="{{ book.quantity }}" min="1" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="shelf_location" class="form-label">Shelf Location</label>
+                        <input type="text" class="form-control" id="shelf_location" name="shelf_location" value="{{ book.shelf_location or '' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Update Book
+                </button>
+                <a href="{{ url_for('manage_books') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

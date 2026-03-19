@@ -1,0 +1,22 @@
+flowchart TD
+    subgraph Finance [Payroll & Expenses]
+        F1[Create Salary Record]
+        F2[Submit Expense]
+        F3[Approve Expense]
+        F4[Generate Reports]
+    end
+
+    subgraph DB[(SQLite)]
+        SAL[Salaries Table]
+        EXP[Expenses Table]
+        USR[Users Table]
+    end
+
+    F1 --> SAL
+    F2 --> EXP
+    F3 --> EXP
+    F4 --> SAL
+    F4 --> EXP
+    F1 --> USR
+    F2 --> USR
+    F3 --> USR

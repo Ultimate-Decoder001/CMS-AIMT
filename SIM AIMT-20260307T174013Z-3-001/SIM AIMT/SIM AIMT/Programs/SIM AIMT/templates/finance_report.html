@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Finance Report - AIMT College{% endblock %}
+{% block page_title %}Finance Report{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Total Salary Paid</h5>
+                <h2>₹{{ "%.2f"|format(total_salary) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5>Total Expenses</h5>
+                <h2>₹{{ "%.2f"|format(total_expenses) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-money-check-alt me-2"></i>Salary Records
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Month/Year</th>
+                        <th>Net Salary</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for salary in salaries %}
+                    <tr>
+                        <td>{{ salary.employee_id }}</td>
+                        <td>{{ salary.employee.name if salary.employee else 'N/A' }}</td>
+                        <td>{{ salary.month }}/{{ salary.year }}</td>
+                        <td>₹{{ "%.2f"|format(salary.net_salary) }}</td>
+                        <td>
+                            <span class="badge bg-{% if salary.payment_status == 'Processed' %}success{% else %}warning{% endif %}">
+                                {{ salary.payment_status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-receipt me-2"></i>Expense Records
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.category }}</td>
+                        <td>{{ expense.description }}</td>
+                        <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                        <td>{{ expense.date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            <span class="badge bg-{% if expense.status == 'Approved' %}success{% elif expense.status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                {{ expense.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

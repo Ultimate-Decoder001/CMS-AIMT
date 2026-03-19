@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Add Salary - AIMT College{% endblock %}
+{% block page_title %}Add Salary Record{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-dollar-sign me-2"></i>Salary Information
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('add_salary') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Employee *</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Select Employee</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.employee_id }}">{{ employee.employee_id }} - {{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="month" class="form-label">Month *</label>
+                        <select class="form-select" id="month" name="month" required>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="year" class="form-label">Year *</label>
+                        <select class="form-select" id="year" name="year" required>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="basic_salary" class="form-label">Basic Salary *</label>
+                        <input type="number" class="form-control" id="basic_salary" name="basic_salary" step="0.01" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="hra" class="form-label">HRA</label>
+                        <input type="number" class="form-control" id="hra" name="hra" step="0.01" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="da" class="form-label">DA</label>
+                        <input type="number" class="form-control" id="da" name="da" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="allowances" class="form-label">Other Allowances</label>
+                        <input type="number" class="form-control" id="allowances" name="allowances" step="0.01" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="deductions" class="form-label">Deductions</label>
+                <input type="number" class="form-control" id="deductions" name="deductions" step="0.01" value="0">
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Add Salary
+                </button>
+                <a href="{{ url_for('manage_salaries') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
